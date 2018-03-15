@@ -1,0 +1,299 @@
+
+\documentclass[submit]{harvardml}
+
+% Put in your full name and email address.
+\name{Your Name}
+\email{email@fas.harvard.edu}
+
+% List any people you worked with.
+\collaborators{%
+  John Doe,
+  Fred Doe
+}
+
+% You don't need to change these.
+\course{CS181-S18}
+\assignment{Assignment \#3}
+\duedate{11:59pm March 23, 2018}
+
+\usepackage[OT1]{fontenc}
+\usepackage[colorlinks,citecolor=blue,urlcolor=blue]{hyperref}
+\usepackage[pdftex]{graphicx}
+\usepackage{subfig}
+\usepackage{fullpage}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{todonotes}
+\usepackage{listings}
+\usepackage{common}
+\usepackage{bm}
+
+\usepackage[mmddyyyy,hhmmss]{datetime}
+
+\definecolor{verbgray}{gray}{0.9}
+
+\lstnewenvironment{csv}{%
+  \lstset{backgroundcolor=\color{verbgray},
+  frame=single,
+  framerule=0pt,
+  basicstyle=\ttfamily,
+  columns=fullflexible}}{}
+
+\begin{document}
+\begin{center}
+{\Large Homework 3: Max-Margin and SVM}\\
+\end{center}
+\subsection*{Introduction}
+
+This homework assignment will have you work with max-margin methods
+and SVM classification. The aim of the assignment is (1) to further
+develop your geometrical intuition behind margin-based classification
+and decision boundaries, (2) to have you implement a basic Kernel-based
+classifier and get some experience in implementing a model/algorithm 
+from an academic paper in the field, and (3) to have you reflect on the
+ethics lecture and to address the scenario discussed in class
+in more depth by considering the labor market dynamically.
+
+There is a mathematical component and a programming component to this
+homework.  Please submit your PDF and Python files to Canvas, and push
+all of your work to your GitHub repository. If a question requires you
+to make any plots, like Problem 3, please include those in the
+writeup.
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Problem 1
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{problem}[Fitting an SVM by hand, 7pts]
+  For this problem you will solve an SVM without the help of a
+  computer, relying instead on principled rules and properties of
+  these classifiers.
+
+Consider a dataset with the following 7 data points each with $x \in \reals$ : \[\{(x_i, y_i)\}_i =\{(-3
+, +1 ), (-2 , +1 ) , (-1,  -1 ), (0, -1), ( 1 , -1 ), ( 2 , +1 ), ( 3 , +1 )\}\] Consider
+mapping these points to $2$ dimensions using the feature vector $\bphi(x) =  (x, x^2)$. The hard margin classifier training problem is:
+%
+\begin{align}
+  &\min_{\mathbf{w}, w_0} \|\mathbf{w}\|_2^2 \label{eq:dcp} \\
+  \quad \text{s.t.} \quad & y_i(\mathbf{w}^\top \bphi(x_i) + w_0) \geq 1,~\forall i \in \{1,\ldots, n\}\notag
+\end{align}
+
+The exercise has been broken down into a series of questions, each
+providing a part of the solution. Make sure to follow the logical structure of
+the exercise when composing your answer and to justify each step.
+
+\begin{enumerate}
+\item Plot the training data in $\reals^2$ and draw the decision boundary
+of the max margin classifer.
+%
+\item  What is the value of the margin achieved by the optimal
+decision boundary? 
+%
+\item What is a vector that is orthogonal to the decision boundary?
+
+%
+\item Considering discriminant $h(\bphi(x);\boldw,w_0)=\boldw^\top\bphi(x) +w_0$, 
+give an expression for {\em all possible} $(\boldw,w_0)$ that define
+the optimal decision boundary. Justify your answer.
+
+  \item Consider now the training problem~\eqref{eq:dcp}. Using
+your answers so far, what particular solution
+to $\boldw$ will be optimal for this optimization
+problem?
+
+  \item Now solve for
+the corresponding value of $w_0$, using your general expression 
+from part~(4.) for the optimal decision boundary.
+Write down the discriminant
+function $h(\bphi(x);\boldw,w_0)$.
+
+
+\item What are the support
+vectors of the classifier?
+ Confirm that the solution in part~(6.) makes the constraints in~\eqref{eq:dcp} binding
+for support vectors.
+
+\end{enumerate}
+
+\end{problem}
+\subsection*{Solution}
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Problem 2
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{problem}[Scaling up your SVM solver, 10pts (+opportunity for extra credit)]
+
+
+  For this problem you will build a simple SVM classifier for a binary
+  classification problem. We have provided you two files for
+  experimentation: training \textit{data.csv} and validation
+  \textit{val.csv}.
+\begin{itemize}
+\item First read the paper at
+  \url{http://www.jmlr.org/papers/volume6/bordes05a/bordes05a.pdf} and
+  implement the Kernel Perceptron algorithm and the Budget Kernel
+  Perceptron algorithm. Aim to make the optimization as fast as possible.
+  Implement this algorithm in \textit{problem2.py}.
+
+  [Hint: For this problem, efficiency will be an issue. Instead of directly
+implementing this algorithm using numpy matrices, you should utilize
+Python dictionaries to represent sparse matrices. This will be necessary 
+to have the algorithm run in a reasonable amount of time.   
+]
+\item Next experiment with the hyperparameters for each of these
+  models. Try seeing if you can identify some patterns by changing
+  $\beta$, $N$ (the maximum number of support vectors), or the number
+  of random training samples taken during the Randomized Search
+  procedure (Section 4.3).  Note the training time, training and
+  validation accuracy, and number of support vectors for various
+  setups.
+\item Lastly, compare the classification to the naive SVM imported from
+scikit-learn by reporting accuracy on the provided validation
+data. {\em For extra credit, implement the SMO algorithm and implement
+  the LASVM process and do the same as above.}\footnote{Extra credit
+  only makes a difference to your grade at the end of the semester if
+  you are on a grade boundary.}
+
+\end{itemize}
+
+
+We are intentionally leaving this problem open-ended to allow for
+experimentation, and so we will be looking for your thought process
+and not a particular graph.  Visualizations should be generated 
+using the provided code. You can use the trivial
+$K(\boldx,\boldx') = \boldx^\top \boldx'$ kernel for this problem,
+though you are welcome to experiment with more interesting kernels
+too.
+
+
+In addition, provide answers the following reading questions
+{\bf in one or two sentences for each}.
+%
+\begin{enumerate}
+\item In one short sentence, state the main purpose of the paper.
+\item Describe each of the parameters in Eq.~1 in the paper
+\item State, informally, one guarantee about the Kernel perceptron algorithm described in the
+  paper. 
+\item What is the main way the budget kernel perceptron algorithm tries to
+  improve on the perceptron algorithm?
+\item ({\em if you did the extra credit}) In simple words, what is the theoretical guarantee of LASVM algorithm? How
+  does it compare to its practical performance?
+\end{enumerate}
+
+
+\end{problem}
+
+\subsection*{Solution}
+
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Problem 3
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{problem}[Ethics Assignment, 10pts]
+Recall our class activity:
+\begin{quote}
+Hiring at Abercrombie and Fitch. Abercrombie and Fitch have hired a new computer science team to design an algorithm to predict the success of various job applicants to sales positions at Abercrombie and Fitch. As you go through the data and design the algorithm, you notice that African-American sales representatives have significantly fewer average sales than white sales representatives. The algorithm's output recommends hiring far fewer African-Americans than white applicants, when the percentage of applications from people of various races are adjusted for.   
+\end{quote}
+
+In class, we thought about the problem \textit{statically}: given historical data, such as data about sales performance, who should Abercrombie and Fitch hire right now? 
+
+In this follow-up assignment, I want you to think about consumer behavior and firm hiring practice dynamically. Looking at features of the labor market dynamically allows you more, or different, degrees of freedom in your model. For example, in class, you probably took consumer preference about the race of their sales representative as given. What would happen if you allowed consumer preference to vary (say, on the basis of changing racial demographics in the sales force)?  
+
+Here’s the new case:
+\begin{quote}
+The US Secretary of Labor has heard about your team's success with Abercrombie and Fitch and comes to you with a request. The Department of Labor wants to reduce disparate impact discrimination in hiring. They want you to come up with a model of fair hiring practices in the labor market that will reduce disparate impact while also producing good outcomes for companies. 
+\end{quote}
+Write two or three paragraphs that address the following:
+\begin{itemize}
+\item What are the relevant socially good outcomes, for both workers and companies?
+\item What are some properties of your algorithm that might produce those socially good results?
+\begin{itemize}
+\item Think about constraints that you might build in, such as the fairness constraints that we discussed in class, or how you might specify the prediction task that we are asking the machine to optimize. 
+\end{itemize}
+\item Are there tradeoffs that your algorithm has to balance? [optional] 
+\item Are there any features of data collection, algorithm implementation, or the social world that make you wary of using machine learning in this case? [optional]
+\end{itemize}
+
+We expect that:
+\begin{itemize}
+\item You focus on one or two points of discussion for each question. 
+\begin{itemize}
+\item For example, for question 2, pick a single fairness criterion. 
+item Depth over breadth here! 
+\end{itemize}
+\item You provide reasons in support of your answers (i.e., explain why you chose your answer).
+\begin{itemize}
+\item For example, for the first question, you might choose the socially good outcome of increased profit for companies, and give reasons why profit is the right social goal.
+\end{itemize}
+\item You are clear and concise - stick to plain, unadorned language.  
+\item You do not do any outside research. 
+\item You demonstrate a thoughtful engagement with the questions. 
+\end{itemize}
+
+
+\end{problem}
+
+\subsection*{Solution}
+  
+
+\newpage
+
+\subsection*{Calibration [1pt]}
+Approximately how long did this homework take you to complete?
+
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
